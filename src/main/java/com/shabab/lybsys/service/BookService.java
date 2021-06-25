@@ -42,4 +42,26 @@ public class BookService {
 
         return books;
     }
+
+    public Book createBook(Book book) {
+        Book savedBook = bookRepository.save(book);
+        return savedBook;
+    }
+
+    public Book updateBook(Book book, Long bookId) throws ResourceNotFoundException {
+        Book existingBook = bookRepository.findById(bookId).orElseThrow(()-> new ResourceNotFoundException(String.format("Book with Id-%s not found!", bookId)));
+        existingBook.setTitle(book.getTitle());
+        existingBook.setAuthor(book.getAuthor());
+        existingBook.setPublishDate(book.getPublishDate());
+        existingBook.setGenre(book.getGenre());
+        existingBook.setBlurb(book.getBlurb());
+
+        Book updatedBook = bookRepository.save(existingBook);
+        return updatedBook;
+    }
+
+    public void deleteBook(Long bookId) throws ResourceNotFoundException {
+        Book bookToBeDeleted = bookRepository.findById(bookId).orElseThrow(()-> new ResourceNotFoundException(String.format("Book with Id-%s not found!", bookId)));
+        bookRepository.delete(bookToBeDeleted);
+    }
 }

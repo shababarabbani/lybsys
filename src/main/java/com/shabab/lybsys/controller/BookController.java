@@ -34,4 +34,24 @@ public class BookController {
         List<Book> books = bookService.searchBooks(searchKey);
         return books;
      }
+
+
+    @PostMapping("/create")
+    public Book createBook(@RequestBody Book book){
+
+        Book createdBook = bookService.createBook(book);
+        return createdBook;
+    }
+
+    @PutMapping("/update")
+    public Book updateBook(@RequestBody Book book, @RequestParam Long bookId) throws ResourceNotFoundException {
+
+        Book updatedBook = bookService.updateBook(book, bookId);
+        return updatedBook;
+    }
+
+    @DeleteMapping("/delete")
+    public void deleteBook(@RequestParam Long bookId) throws ResourceNotFoundException {
+        bookService.deleteBook(bookId);
+    }
 }
