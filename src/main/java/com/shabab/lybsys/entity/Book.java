@@ -11,10 +11,10 @@ import java.util.Date;
 @Getter
 @Entity
 @Table(name = "book")
-public class Book {
+public class Book extends Auditable<String>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long bookId;
 
     private String title;
     private String author;
