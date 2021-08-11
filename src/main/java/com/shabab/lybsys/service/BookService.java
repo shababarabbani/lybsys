@@ -1,21 +1,39 @@
 package com.shabab.lybsys.service;
 
 import com.shabab.lybsys.entity.Book;
+import com.shabab.lybsys.entity.IssuedBook;
+import com.shabab.lybsys.entity.Student;
 import com.shabab.lybsys.exception.BadRequestException;
 import com.shabab.lybsys.exception.ResourceNotFoundException;
 import com.shabab.lybsys.repository.BookRepository;
+import com.shabab.lybsys.repository.IssuedBookRepository;
+import com.shabab.lybsys.repository.StudentRepository;
+import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private IssuedBookRepository issuedBookRepository;
+
+    @Value("${books.issue-period}")
+    private String bookIssuePeriod;
 
 
     public List<Book> getAllBooks() throws ResourceNotFoundException {
@@ -63,5 +81,46 @@ public class BookService {
     public void deleteBook(Long bookId) throws ResourceNotFoundException {
         Book bookToBeDeleted = bookRepository.findById(bookId).orElseThrow(()-> new ResourceNotFoundException(String.format("Book with Id-%s not found!", bookId)));
         bookRepository.delete(bookToBeDeleted);
+    }
+
+    public List<IssuedBook> issueBooks(Long studentId, List<Long> bookIds) throws ResourceNotFoundException {
+        Student student= studentRepository.findById(studentId).orElseThrow(()-> new ResourceNotFoundException(String.format("Student with Id-%s not found!", studentId)));
+        List<Book> booksToBeIssued=bookRepository.findAllByBookIdIn(bookIds);
+        List<IssuedBook> issuedBooks=booksToBeIssued.stream().map((book)-> {
+                    IssuedBook issuedBook = new IssuedBook();
+                    issuedBook.setBook(book);
+                    issuedBook.setStudent(student);
+                    issuedBook.setIssuedOn(LocalDate.now());
+                    issuedBook.setIssuedTill(LocalDate.now().plusDays(Integer.parseInt(bookIssuePeriod)));
+                    issuedBook.setIsCurrentlyIssued(true);
+                    issuedBookRepository.save(issuedBook);
+                    return issuedBook;
+                }).collect(Collectors.toList());
+        return issuedBooks;
+    }
+
+    public List<IssuedBook> returnBooks(List<Long> issuedBookIds) throws ResourceNotFoundException {
+        List<IssuedBook> issuedBooks=issuedBookRepository.findAllByIssuedBookIdIn(issuedBookIds);
+
+        List<IssuedBook> returnedBooks=issuedBooks.stream().map(issuedBook -> {
+            issuedBook.setIsCurrentlyIssued(false);
+            issuedBook.setReturnedOn(LocalDate.now());
+            issuedBookRepository.save(issuedBook);
+            return issuedBook;
+        }).collect(Collectors.toList());
+
+        return returnedBooks;
+
+    }
+
+    public List<IssuedBook> getIssuedBooksByStudentId(Long studentId, Boolean includeHistory) throws ResourceNotFoundException {
+        Student student= studentRepository.findById(studentId).orElseThrow(()-> new ResourceNotFoundException(String.format("Student with Id-%s not found!", studentId)));
+
+        Set<IssuedBook> issuedBooks=student.getIssuedBooks();
+        if(includeHistory){
+            return new ArrayList<>(issuedBooks);
+        }else{
+            return issuedBooks.stream().filter(IssuedBook::getIsCurrentlyIssued).collect(Collectors.toList());
+        }
     }
 }

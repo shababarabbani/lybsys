@@ -1,9 +1,11 @@
 package com.shabab.lybsys.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,6 +16,7 @@ import java.util.Date;
 public class Book extends Auditable<String>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "book_id")
     private Long bookId;
 
     private String title;
@@ -21,4 +24,8 @@ public class Book extends Auditable<String>{
     private Date publishDate;
     private String genre;
     private String blurb;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "book")
+    private Set<IssuedBook> issuedBooks;
 }

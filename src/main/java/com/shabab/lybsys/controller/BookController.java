@@ -1,13 +1,13 @@
 package com.shabab.lybsys.controller;
 
 import com.shabab.lybsys.entity.Book;
+import com.shabab.lybsys.entity.IssuedBook;
 import com.shabab.lybsys.exception.BadRequestException;
 import com.shabab.lybsys.exception.ResourceNotFoundException;
 import com.shabab.lybsys.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/api/books")
@@ -35,6 +35,23 @@ public class BookController {
         return books;
      }
 
+    @PostMapping("/issue")
+    public List<IssuedBook> issueBooks(@RequestParam Long studentId, @RequestParam List<Long> bookIds) throws BadRequestException, ResourceNotFoundException {
+        List<IssuedBook> issuedBooks = bookService.issueBooks(studentId,bookIds);
+        return issuedBooks;
+    }
+
+    @PostMapping("/return")
+    public List<IssuedBook> returnBooks(@RequestParam List<Long> issuedBookIds) throws BadRequestException, ResourceNotFoundException {
+        List<IssuedBook> returnedBooks = bookService.returnBooks(issuedBookIds);
+        return returnedBooks;
+    }
+
+    @GetMapping("/student/{studentId}")
+    public List<IssuedBook> getIssuedBooksByStudentID(@PathVariable Long studentId,@RequestParam(defaultValue = "false",required = false) Boolean includeHistory) throws ResourceNotFoundException {
+        List<IssuedBook> issuedBooks = bookService.getIssuedBooksByStudentId(studentId,includeHistory);
+        return issuedBooks;
+    }
 
     @PostMapping("/create")
     public Book createBook(@RequestBody Book book){
