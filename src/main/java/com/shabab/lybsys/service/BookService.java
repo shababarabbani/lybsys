@@ -86,16 +86,23 @@ public class BookService {
     public List<IssuedBook> issueBooks(Long studentId, List<Long> bookIds) throws ResourceNotFoundException {
         Student student= studentRepository.findById(studentId).orElseThrow(()-> new ResourceNotFoundException(String.format("Student with Id-%s not found!", studentId)));
         List<Book> booksToBeIssued=bookRepository.findAllByBookIdIn(bookIds);
-        List<IssuedBook> issuedBooks=booksToBeIssued.stream().map((book)-> {
-                    IssuedBook issuedBook = new IssuedBook();
-                    issuedBook.setBook(book);
-                    issuedBook.setStudent(student);
-                    issuedBook.setIssuedOn(LocalDate.now());
-                    issuedBook.setIssuedTill(LocalDate.now().plusDays(Integer.parseInt(bookIssuePeriod)));
-                    issuedBook.setIsCurrentlyIssued(true);
-                    issuedBookRepository.save(issuedBook);
+
+        List<IssuedBook> issuedBooks = booksToBeIssued.stream().filter(book -> book.getCount() > 0).map((book)-> {
+                    IssuedBook alreadyIssuedBook=issuedBookRepository.findByBookIdAndStudentIdAndIsCurrentlyIssued(book.getBookId(), student.getStudentId(), true);
+                    IssuedBook issuedBook=null;
+                    if(alreadyIssuedBook==null) {
+                        book.setCount(book.getCount() - 1);
+                        issuedBook = new IssuedBook();
+                        issuedBook.setBook(book);
+                        issuedBook.setStudent(student);
+                        issuedBook.setIssuedOn(LocalDate.now());
+                        issuedBook.setIssuedTill(LocalDate.now().plusDays(Integer.parseInt(bookIssuePeriod)));
+                        issuedBook.setIsCurrentlyIssued(true);
+                        issuedBookRepository.save(issuedBook);
+                    }
                     return issuedBook;
                 }).collect(Collectors.toList());
+
         return issuedBooks;
     }
 
@@ -103,6 +110,7 @@ public class BookService {
         List<IssuedBook> issuedBooks=issuedBookRepository.findAllByIssuedBookIdIn(issuedBookIds);
 
         List<IssuedBook> returnedBooks=issuedBooks.stream().map(issuedBook -> {
+            issuedBook.getBook().setCount(issuedBook.getBook().getCount() + 1);
             issuedBook.setIsCurrentlyIssued(false);
             issuedBook.setReturnedOn(LocalDate.now());
             issuedBookRepository.save(issuedBook);

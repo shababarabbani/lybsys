@@ -24,6 +24,7 @@ public class Book extends Auditable<String>{
     private Date publishDate;
     private String genre;
     private String blurb;
+    private Integer count;
 
     @JsonIgnore
     @OneToMany(mappedBy = "book")
