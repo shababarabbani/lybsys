@@ -33,5 +33,4 @@ public class IssuedBook extends Auditable<String>{
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false, referencedColumnName = "student_id")
     private Student student;
-
 }

@@ -33,5 +33,4 @@ public class Student extends Auditable<String>{
     @JsonIgnore
     @OneToMany(mappedBy = "student")
     private Set<IssuedBook> issuedBooks;
-
 }

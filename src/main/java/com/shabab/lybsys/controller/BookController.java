@@ -5,6 +5,7 @@ import com.shabab.lybsys.entity.IssuedBook;
 import com.shabab.lybsys.exception.BadRequestException;
 import com.shabab.lybsys.exception.ResourceNotFoundException;
 import com.shabab.lybsys.service.BookService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RequestMapping("/api/books")
 @RestController
+@Api(value = "Books", description = "APIs for books CRUD Operations")
 public class BookController {
 
     @Autowired
@@ -47,8 +49,8 @@ public class BookController {
         return returnedBooks;
     }
 
-    @GetMapping("/student/{studentId}")
-    public List<IssuedBook> getIssuedBooksByStudentID(@PathVariable Long studentId,@RequestParam(defaultValue = "false",required = false) Boolean includeHistory) throws ResourceNotFoundException {
+    @GetMapping("/student")
+    public List<IssuedBook> getIssuedBooksByStudentID(@RequestParam Long studentId,@RequestParam(defaultValue = "false",required = false) Boolean includeHistory) throws ResourceNotFoundException {
         List<IssuedBook> issuedBooks = bookService.getIssuedBooksByStudentId(studentId,includeHistory);
         return issuedBooks;
     }
