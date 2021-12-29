@@ -88,7 +88,7 @@ public class BookService {
         List<Book> booksToBeIssued=bookRepository.findAllByBookIdIn(bookIds);
 
         List<IssuedBook> issuedBooks = booksToBeIssued.stream().filter(book -> book.getCount() > 0).map((book)-> {
-                    IssuedBook alreadyIssuedBook=issuedBookRepository.findByBookIdAndStudentIdAndIsCurrentlyIssued(book.getBookId(), student.getStudentId(), true);
+                    IssuedBook alreadyIssuedBook=issuedBookRepository.findByBookBookIdAndStudentStudentIdAndIsCurrentlyIssued(book.getBookId(), student.getStudentId(), true);
                     IssuedBook issuedBook=null;
                     if(alreadyIssuedBook==null) {
                         book.setCount(book.getCount() - 1);

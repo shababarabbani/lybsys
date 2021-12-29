@@ -10,5 +10,5 @@ import java.util.List;
 public interface IssuedBookRepository extends JpaRepository<IssuedBook,Long> {
 
     List<IssuedBook> findAllByIssuedBookIdIn(List<Long> issuedBookIds);
-    IssuedBook findByBookIdAndStudentIdAndIsCurrentlyIssued(Long bookId, Long StudentId, Boolean isCurrentlyIssued);
+    IssuedBook findByBookBookIdAndStudentStudentIdAndIsCurrentlyIssued(Long bookId, Long StudentId, Boolean isCurrentlyIssued);
 }
