@@ -1,6 +1,5 @@
 package com.shabab.lybsys.exception;
 
-import com.shabab.lybsys.dto.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

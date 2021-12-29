@@ -1,4 +1,4 @@
-package com.shabab.lybsys.dto;
+package com.shabab.lybsys.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
